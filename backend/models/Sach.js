@@ -27,7 +27,7 @@ const sachSchema = new mongoose.Schema({
         required: true
     },
     MaNXB: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'NhaXuatBan'
     },

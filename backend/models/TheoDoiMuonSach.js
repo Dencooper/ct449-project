@@ -2,12 +2,12 @@ import mongoose from 'mongoose';
 
 const theoDoiMuonSachSchema = new mongoose.Schema({
   MaDocGia: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'DocGia'
   },
   MaSach: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'Sach'
   },
