@@ -6,7 +6,6 @@ import {
   updateSach,
   deleteSach,
   getSachBorrowHistory,
-  searchSach,
   getSachAvailability
 } from '../controllers/sachController.js';
 import { authenticate, authorizeLibrarian } from '../controllers/authController.js';
@@ -14,7 +13,6 @@ import { authenticate, authorizeLibrarian } from '../controllers/authController.
 const router = express.Router();
 
 router.use(authenticate);
-router.get('/search', searchSach);
 router.get('/:id/availability', getSachAvailability);
 router.get('/', getAllSach);
 router.get('/:id', getSachById);

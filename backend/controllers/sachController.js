@@ -63,8 +63,8 @@ export const createSach = async (req, res) => {
 
 export const updateSach = async (req, res) => {
   try {
-    const sach = await Sach.findOneAndUpdate(
-      { MaSach: req.params.id },
+    const sach = await Sach.findByIdAndUpdate(
+      req.params.id,
       req.body,
       { new: true, runValidators: true }
     );
@@ -141,44 +141,6 @@ export const getSachBorrowHistory = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Không thể lấy lịch sử mượn sách',
-      error: error.message
-    });
-  }
-};
-
-export const searchSach = async (req, res) => {
-  try {
-    const { keyword, nxb, namXuatBan } = req.query;
-    
-    let query = {};
-    
-    if (keyword) {
-      query.$or = [
-        { TenSach: { $regex: keyword, $options: 'i' } },
-        { TacGia: { $regex: keyword, $options: 'i' } },
-        { MaSach: { $regex: keyword, $options: 'i' } }
-      ];
-    }
-    
-    if (nxb) {
-      query.MaNXB = nxb;
-    }
-    
-    if (namXuatBan) {
-      query.NamXuatBan = namXuatBan;
-    }
-    
-    const sachs = await Sach.find(query).populate('MaNXB', 'TenNXB');
-    
-    res.status(200).json({
-      success: true,
-      count: sachs.length,
-      data: sachs
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Không thể tìm kiếm sách',
       error: error.message
     });
   }

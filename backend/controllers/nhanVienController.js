@@ -24,7 +24,7 @@ export const getNhanVienById = async (req, res) => {
     
     if (!nhanVien) {
       return res.status(404).json({
-        success: false,
+        success: false, 
         message: 'Không tìm thấy nhân viên'
       });
     }
@@ -120,7 +120,6 @@ export const deleteNhanVien = async (req, res) => {
 export const loginNhanVien = async (req, res) => {
   try {
     const { MSNV, Password } = req.body;
-    
     const nhanVien = await NhanVien.findOne({ MSNV });
     
     if (!nhanVien) {
@@ -129,7 +128,6 @@ export const loginNhanVien = async (req, res) => {
         message: 'Mã số nhân viên không tồn tại'
       });
     }
-    
     const isMatch = await nhanVien.comparePassword(Password);
     
     if (!isMatch) {

@@ -7,13 +7,9 @@ import {
   deleteNhanVien,
   changePassword
 } from '../controllers/nhanVienController.js';
-import { authenticate, authorizeAdmin } from '../controllers/authController.js';
+import { authorizeAdmin } from '../controllers/authController.js';
 
 const router = express.Router();
-
-router.use(authenticate);
-
-router.put('/:id/change-password', changePassword);
 
 router.use(authorizeAdmin);
 router.get('/', getAllNhanVien);

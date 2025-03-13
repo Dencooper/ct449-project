@@ -12,7 +12,6 @@ import { authenticate, authorizeLibrarian } from '../controllers/authController.
 const router = express.Router();
 
 router.use(authenticate);
-
 router.get('/', getAllNhaXuatBan);
 router.get('/:id', getNhaXuatBanById);
 router.get('/:id/books', getNhaXuatBanBooks);

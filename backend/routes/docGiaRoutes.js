@@ -12,9 +12,6 @@ import { authenticate, authorizeLibrarian } from '../controllers/authController.
 
 const router = express.Router();
 
-router.use(authenticate);
-router.get('/search', searchDocGia);
-
 router.use(authorizeLibrarian);
 router.get('/', getAllDocGia);
 router.get('/:id', getDocGiaById);

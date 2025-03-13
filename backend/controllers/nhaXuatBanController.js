@@ -9,7 +9,7 @@ export const getAllNhaXuatBan = async (req, res) => {
       count: nhaXuatBans.length,
       data: nhaXuatBans
     });
-  } catch (error) {
+  } catch (error) {    
     res.status(500).json({
       success: false,
       message: 'Không thể lấy danh sách nhà xuất bản',
@@ -63,8 +63,8 @@ export const createNhaXuatBan = async (req, res) => {
 
 export const updateNhaXuatBan = async (req, res) => {
   try {
-    const nhaXuatBan = await NhaXuatBan.findOneAndUpdate(
-      { MaNXB: req.params.id },
+    const nhaXuatBan = await NhaXuatBan.findByIdAndUpdate(
+      req.params.id,
       req.body,
       { new: true, runValidators: true }
     );
@@ -92,7 +92,7 @@ export const updateNhaXuatBan = async (req, res) => {
 
 export const deleteNhaXuatBan = async (req, res) => {
   try {
-    const sachCount = await Sach.countDocuments({ MaNXB: req.params.id });
+    const sachCount = await Sach.countDocuments({ _id: req.params.id });
     
     if (sachCount > 0) {
       return res.status(400).json({
@@ -101,7 +101,7 @@ export const deleteNhaXuatBan = async (req, res) => {
       });
     }
     
-    const nhaXuatBan = await NhaXuatBan.findOneAndDelete({ MaNXB: req.params.id });
+    const nhaXuatBan = await NhaXuatBan.findByIdAndDelete(req.params.id);
     
     if (!nhaXuatBan) {
       return res.status(404).json({
