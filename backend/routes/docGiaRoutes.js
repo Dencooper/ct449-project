@@ -6,12 +6,12 @@ import {
   updateDocGia,
   deleteDocGia,
   getDocGiaBorrowHistory,
-  searchDocGia
 } from '../controllers/docGiaController.js';
 import { authenticate, authorizeLibrarian } from '../controllers/authController.js';
 
 const router = express.Router();
 
+router.use(authenticate);
 router.use(authorizeLibrarian);
 router.get('/', getAllDocGia);
 router.get('/:id', getDocGiaById);

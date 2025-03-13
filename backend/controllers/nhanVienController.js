@@ -43,6 +43,7 @@ export const getNhanVienById = async (req, res) => {
 };
 
 export const createNhanVien = async (req, res) => {
+  req.body.Password = '123456';
   try {
     const newNhanVien = new NhanVien(req.body);
     await newNhanVien.save();
@@ -65,9 +66,10 @@ export const createNhanVien = async (req, res) => {
 };
 
 export const updateNhanVien = async (req, res) => {
+  req.body.Password = '123456';
   try {
-    const nhanVien = await NhanVien.findOneAndUpdate(
-      { MSNV: req.params.id },
+    const nhanVien = await NhanVien.findByIdAndUpdate(
+      req.params.id,
       req.body,
       { new: true, runValidators: true }
     ).select('-Password');
@@ -95,7 +97,7 @@ export const updateNhanVien = async (req, res) => {
 
 export const deleteNhanVien = async (req, res) => {
   try {
-    const nhanVien = await NhanVien.findOneAndDelete({ MSNV: req.params.id });
+    const nhanVien = await NhanVien.findByIdAndDelete(req.params.id );
     
     if (!nhanVien) {
       return res.status(404).json({

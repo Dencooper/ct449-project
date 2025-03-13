@@ -43,6 +43,10 @@ export const getDocGiaById = async (req, res) => {
 };
 
 export const createDocGia = async (req, res) => {
+  if (req.body.NgaySinh) {
+      const [day, month, year] = req.body.NgaySinh.split('/');
+      req.body.NgaySinh = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
+    }
   try {
     const newDocGia = new DocGia(req.body);
     await newDocGia.save();
@@ -62,9 +66,13 @@ export const createDocGia = async (req, res) => {
 };
 
 export const updateDocGia = async (req, res) => {
+  if (req.body.NgaySinh) {
+      const [day, month, year] = req.body.NgaySinh.split('/');
+      req.body.NgaySinh = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
+    }
   try {
-    const docGia = await DocGia.findOneAndUpdate(
-      { MaDocGia: req.params.id },
+    const docGia = await DocGia.findByIdAndUpdate(
+      req.params.id,
       req.body,
       { new: true, runValidators: true }
     );
@@ -141,41 +149,6 @@ export const getDocGiaBorrowHistory = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Không thể lấy lịch sử mượn sách',
-      error: error.message
-    });
-  }
-};
-
-export const searchDocGia = async (req, res) => {
-  try {
-    const { keyword } = req.query;
-    
-    if (!keyword) {
-      return res.status(400).json({
-        success: false,
-        message: 'Vui lòng cung cấp từ khóa tìm kiếm'
-      });
-    }
-    
-    const docGias = await DocGia.find({
-      $or: [
-        { HoLot: { $regex: keyword, $options: 'i' } },
-        { Ten: { $regex: keyword, $options: 'i' } },
-        { DiaChi: { $regex: keyword, $options: 'i' } },
-        { DienThoai: { $regex: keyword, $options: 'i' } },
-        { MaDocGia: { $regex: keyword, $options: 'i' } }
-      ]
-    });
-    
-    res.status(200).json({
-      success: true,
-      count: docGias.length,
-      data: docGias
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Không thể tìm kiếm độc giả',
       error: error.message
     });
   }
