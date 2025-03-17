@@ -106,8 +106,6 @@ const handleLogin = async () => {
       MSNV: msnv.value,
       Password: password.value
     })
-    console.log("Login success:", success);
-    console.log("User loaded:", authStore.isNhanVienLoaded);
     if (success) {
       const redirectPath = route.query.redirect || '/'
       router.push(redirectPath)

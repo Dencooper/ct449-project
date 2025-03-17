@@ -1,14 +1,15 @@
 import TheoDoiMuonSach from '../models/TheoDoiMuonSach.js';
 import Sach from '../models/Sach.js';
 import DocGia from '../models/DocGia.js';
+import mongoose from 'mongoose';
 
 export const getAllMuonSach = async (req, res) => {
   try {
     const muonSachs = await TheoDoiMuonSach.find()
-      .populate('MaDocGia', 'HoLot Ten')
-      .populate('MaSach', 'TenSach TacGia')
+      .populate('MaDocGia', 'MaDocGia HoLot Ten')
+      .populate('MaSach', 'MaSach TenSach TacGia')
+      .populate('MSNV', 'MSNV HoTenNV')
       .sort({ NgayMuon: -1 });
-    
     res.status(200).json({
       success: true,
       count: muonSachs.length,
@@ -52,65 +53,59 @@ export const getMuonSachById = async (req, res) => {
 export const createMuonSach = async (req, res) => {
   try {
     const { MaDocGia, MaSach } = req.body;
-    const docGia = await DocGia.findById(MaDocGia);
-    const sach = await Sach.findById(MaSach);
+
+    if (!MaDocGia || !MaSach) {
+      return res.status(400).json({
+        success: false,
+        message: 'Thiếu thông tin MaDocGia hoặc MaSach',
+      });
+    }
+
+    const maDocGia = MaDocGia.MaDocGia;
+    const maSach = MaSach.MaSach;
+
+    const docGia = await DocGia.findOne({ MaDocGia: maDocGia });
+    const sach = await Sach.findOne({ MaSach: maSach });
+    const nhanVien = req.nhanVien;
+
     if (!docGia) {
       return res.status(404).json({
         success: false,
-        message: 'Không tìm thấy độc giả'
+        message: 'Không tìm thấy độc giả',
       });
     }
-    
+
     if (!sach) {
       return res.status(404).json({
         success: false,
-        message: 'Không tìm thấy sách'
+        message: 'Không tìm thấy sách',
       });
     }
-    
-    
-    const newMuonSach = new TheoDoiMuonSach(req.body);
-    await newMuonSach.save();
-    
-    res.status(201).json({
-      success: true,
-      message: 'Tạo phiếu mượn sách thành công',
-      data: newMuonSach
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Không thể tạo phiếu mượn sách',
-      error: error.message
-    });
-  }
-};
 
-export const updateMuonSach = async (req, res) => {
-  try {
-    const muonSach = await TheoDoiMuonSach.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    
-    if (!muonSach) {
-      return res.status(404).json({
-        success: false,
-        message: 'Không tìm thấy phiếu mượn sách'
-      });
-    }
-    
-    res.status(200).json({
+    const newMuonSach = new TheoDoiMuonSach({
+      MaDocGia: new mongoose.Types.ObjectId(docGia._id),
+      MaSach: new mongoose.Types.ObjectId(sach._id), 
+      MSNV: new mongoose.Types.ObjectId(nhanVien._id),
+      NgayMuon: new Date(),
+    });
+
+    sach.SoQuyen -= 1;
+
+    await newMuonSach.save();
+    sach.save();
+
+
+    return res.status(201).json({
       success: true,
-      message: 'Cập nhật phiếu mượn sách thành công',
-      data: muonSach
+      message: 'Tạo bản ghi mượn sách thành công',
+      data: newMuonSach,
     });
   } catch (error) {
-    res.status(400).json({
+    console.error('Lỗi khi tạo bản ghi mượn sách:', error);
+    return res.status(500).json({
       success: false,
-      message: 'Không thể cập nhật phiếu mượn sách',
-      error: error.message
+      message: 'Đã xảy ra lỗi khi tạo bản ghi mượn sách',
+      error: error.message,
     });
   }
 };
@@ -118,7 +113,7 @@ export const updateMuonSach = async (req, res) => {
 export const returnBook = async (req, res) => {
   try {
     const muonSach = await TheoDoiMuonSach.findById(req.params.id);
-    
+    const sach = await Sach.findById(muonSach.MaSach);
     if (!muonSach) {
       return res.status(404).json({
         success: false,
@@ -135,7 +130,11 @@ export const returnBook = async (req, res) => {
     
     muonSach.NgayTra = new Date();
     
+    sach.SoQuyen += 1;
+
     await muonSach.save();
+    sach.save();
+
     
     res.status(200).json({
       success: true,
@@ -151,90 +150,31 @@ export const returnBook = async (req, res) => {
   }
 };
 
-export const getBorrowingBooks = async (req, res) => {
+export const deleteMuonSach = async (req, res) => {
   try {
-    const muonSachs = await TheoDoiMuonSach.find({ NgayTra: undefined })
-      .populate('MaDocGia', 'HoLot Ten')
-      .populate('MaSach', 'TenSach TacGia')
-      .sort({ NgayMuon: -1 });
+    const muonSach = await TheoDoiMuonSach.findByIdAndDelete(req.params.id);
+    const sach = await Sach.findById(muonSach.MaSach);
+    sach.SoQuyen += 1;
     
-    res.status(200).json({
-      success: true,
-      count: muonSachs.length,
-      data: muonSachs
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Không thể lấy danh sách sách đang mượn',
-      error: error.message
-    });
-  }
-};
-
-export const getOverdueBooks = async (req, res) => {
-  try {
-    const today = new Date();
-    const thirtyDaysAgo = new Date(today);
-    thirtyDaysAgo.setDate(today.getDate() - 30);
-    
-    const muonSachs = await TheoDoiMuonSach.find({
-      NgayMuon: { $lt: thirtyDaysAgo }
-    })
-      .populate('MaDocGia', 'HoLot Ten DiaChi DienThoai')
-      .populate('MaSach', 'TenSach TacGia')
-      .sort({ NgayMuon: 1 });
-    
-    res.status(200).json({
-      success: true,
-      count: muonSachs.length,
-      data: muonSachs
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Không thể lấy danh sách sách quá hạn',
-      error: error.message
-    });
-  }
-};
-
-export const getBorrowingStatistics = async (req, res) => {
-    try {
-        const today = new Date();
-        const thirtyDaysAgo = new Date(today);
-        thirtyDaysAgo.setDate(today.getDate() - 30);
-        const totalBorrowings = await TheoDoiMuonSach.countDocuments();
-        const activeBorrowings = await TheoDoiMuonSach.countDocuments({ NgayTra: undefined });
-        const returnedBorrowings = await TheoDoiMuonSach.countDocuments({ NgayTra });
-        const overdueBorrowings = await TheoDoiMuonSach.countDocuments({ NgayMuon: { $lt: thirtyDaysAgo } });
-        
-        const currentDate = new Date();
-        const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-        
-        const borrowingsThisMonth = await TheoDoiMuonSach.countDocuments({
-            NgayMuon: {
-                $gte: firstDayOfMonth,
-                $lte: lastDayOfMonth
-            }
-        });
-        
-        res.status(200).json({
-            success: true,
-            data: {
-                totalBorrowings,
-                activeBorrowings,
-                returnedBorrowings,
-                overdueBorrowings,
-                borrowingsThisMonth
-            }
-        });
-    } catch (error) {
-        res.status(500).json({
+    if (!muonSach) {
+      return res.status(404).json({
         success: false,
-        message: 'Không thể lấy thống kê mượn sách',
-        error: error.message
-        });
+        message: 'Không tìm thấy phiếu mượn sách'
+      });
     }
+    
+    await sach.save();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Xóa phiếu mượn sách thành công',
+      data: muonSach
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Không thể xóa phiếu mượn sách',
+      error: error.message    
+    });
+  }
 };

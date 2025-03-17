@@ -11,6 +11,11 @@ const theoDoiMuonSachSchema = new mongoose.Schema({
     required: true,
     ref: 'Sach'
   },
+  MSNV: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'NhanVien'
+  },
   NgayMuon: {
     type: Date,
     required: true,

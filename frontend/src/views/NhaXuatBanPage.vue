@@ -18,6 +18,7 @@
             </div>
           </div>
           <button
+            v-if="authStore.nhanVien.ChucVu !== 'Nhan Vien'"
             @click="openNhaXuatBanModal()"
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
@@ -46,7 +47,7 @@
             <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
               Số sách
             </th>
-            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" v-if="authStore.nhanVien.ChucVu !== 'Nhan Vien'">
               Thao tác
             </th>
           </tr>
@@ -78,7 +79,7 @@
                 <div class="text-sm text-center font-medium text-gray-900">{{ nxb.booksQuantity }}</div>
             </td>
 
-            <td class="px-3 py-5 whitespace-nowrap text-right text-sm font-medium">
+            <td class="px-3 py-5 whitespace-nowrap text-right text-sm font-medium" v-if="authStore.nhanVien.ChucVu !== 'Nhan Vien'">
               <div class="flex justify-end space-x-2">
                 <button
                   @click="openNhaXuatBanModal(nxb)"
@@ -231,10 +232,12 @@
 
 import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { getAllNhaXuatBan, createNhaXuatBan, updateNhaXuatBan, deleteNhaXuatBan as apiDeleteNhaXuatBan, getNhaXuatBanBooks } from '../api';
+import { useAuthStore } from '../stores/auth';
 
 // State
 const nhaXuatBanList = ref([]);
 const loading = ref(true);
+const authStore = useAuthStore();
 const searchQuery = ref('');
 const showNhaXuatBanModal = ref(false);
 const showDeleteModal = ref(false);
@@ -270,8 +273,6 @@ const loadNhaXuatBan = async () => {
       const newNhaXuatBan = { ...nhaXuatBanList.value[i], booksQuantity: sachList.length};
       nhaXuatBanList.value[i] = newNhaXuatBan;
     }
-    console.log(nhaXuatBanList.value);
-
   } catch (error) {
     console.error('Lỗi tải sách: ', error);
   } finally {

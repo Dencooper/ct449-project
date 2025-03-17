@@ -3,12 +3,23 @@ import TheoDoiMuonSach from '../models/TheoDoiMuonSach.js';
 
 export const getAllSach = async (req, res) => {
   try {
-    const sachs = await Sach.find().populate('MaNXB', 'MaNXB TenNXB');
-    res.status(200).json({
-      success: true,
-      count: sachs.length,
-      data: sachs
-    });
+    if(req.query.avaiable){
+      const sachs = await Sach.find({ SoQuyen: { $gt: 0 } }).populate('MaNXB', 'MaNXB TenNXB');
+      
+      res.status(200).json({
+        success: true,
+        count: sachs.length,
+        data: sachs
+      });
+    }
+    else{
+      const sachs = await Sach.find().populate('MaNXB', 'MaNXB TenNXB');
+      res.status(200).json({
+        success: true,
+        count: sachs.length,
+        data: sachs
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -94,7 +105,7 @@ export const deleteSach = async (req, res) => {
   try {
     const borrowings = await TheoDoiMuonSach.find({
       MaSach: req.params.id,
-      TrangThai: 'Đang mượn'
+      NgayTra: null
     });
     
     if (borrowings.length > 0) {
@@ -147,37 +158,17 @@ export const getSachBorrowHistory = async (req, res) => {
 };
 
 export const getSachAvailability = async (req, res) => {
-  try {
-    const sach = await Sach.findOne({ MaSach: req.params.id });
-    
-    if (!sach) {
-      return res.status(404).json({
-        success: false,
-        message: 'Không tìm thấy sách'
-      });
-    }
-    
-    const borrowedCount = await TheoDoiMuonSach.countDocuments({
-      MaSach: req.params.id,
-      TrangThai: 'Đang mượn'
-    });
-    
-    const availableCount = sach.SoQuyen - borrowedCount;
-    
+   try {
+    const sachs = await Sach.find({ SoQuyen: { $gt: 0 } }).populate('MaNXB', 'MaNXB TenNXB');
     res.status(200).json({
       success: true,
-      data: {
-        MaSach: sach.MaSach,
-        TenSach: sach.TenSach,
-        TongSo: sach.SoQuyen,
-        DangMuon: borrowedCount,
-        ConLai: availableCount
-      }
+      count: sachs.length,
+      data: sachs
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Không thể lấy thông tin sách có sẵn',
+      message: 'Không thể lấy danh sách sách',
       error: error.message
     });
   }

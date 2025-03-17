@@ -175,7 +175,7 @@
                         v-model="editingDocGia.NgaySinh"
                         type="text"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        placeholder="dd/mm/yyyy"
+                        placeholder="dd-mm-yyyy"
                         @input="validateDate"
                       ></input>
                       <p v-if="errorMessage" class="text-red-500 text-sm mt-1">{{ errorMessage }}</p>
@@ -394,14 +394,17 @@ const deleteDocGia = async () => {
     alert('Có lỗi xảy ra khi xóa đọc giả. Vui lòng thử lại.');
   }
 };
+
 const formatDate = (dateString) => {
     if (!dateString) return '';
-    return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(dateString));
+    return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      .format(new Date(dateString))
+      .replace(/\//g, '-'); ;
 };
 const validateDate = () => {
-  const regex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+  const regex = /^(0[1-9]|[12][0-9]|3[01])\-(0[1-9]|1[0-2])\-\d{4}$/;
   if (editingDocGia.NgaySinh && !regex.test(editingDocGia.NgaySinh)) {
-    errorMessage.value = 'Ngày sinh không đúng định dạng dd/mm/yyyy';
+    errorMessage.value = 'Ngày sinh không đúng định dạng dd-mm-yyyy';
   } else {
     errorMessage.value = '';
   }

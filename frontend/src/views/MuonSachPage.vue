@@ -2,14 +2,14 @@
   <div class="min-h-screen bg-gray-100">
     <!-- Header và công cụ tìm kiếm -->
     <div class="flex-1 p-5">
-      <h1 class="text-3xl font-semibold text-gray-900 mb-4 h-16 md:mb-0">Quản Lý Sách</h1>
+      <h1 class="text-3xl font-semibold text-gray-900 mb-4 h-16 md:mb-0">Quản Lý Mượn Sách</h1>
       <!-- Bộ lọc -->
       <div class="flex flex-wrap gap-3 justify-between">
           <div class="relative">
             <input
               type="text"
               v-model="searchQuery"
-              placeholder="Tìm kiếm sách..."
+              placeholder="Tìm kiếm phiếu..."
               class="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               @input="handleSearch"
             />
@@ -20,13 +20,13 @@
             </div>
           </div>
           <button
-            @click="openSachModal()"
+            @click="openMuonSachModal()"
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            Thêm sách sách
+            Đăng ký mượn sách
           </button>
         </div>
     </div>
@@ -42,71 +42,73 @@
             <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Tên sách
             </th>
-            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Đơn giá
-            </th>
-            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Số quyển
-            </th>
-            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Năm
-            </th>
-            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+             <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Tác giả
             </th>
-            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nhà xuất bản
+            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Mã đọc giả
             </th>
-            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Họ tên
+            </th>
+            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              MSNV
+            </th>
+            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Ngày Mượn
+            </th>
+            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Ngày Trả
+            </th>
+            <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
               Thao tác
             </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-300">
           <tr v-if="loading">
-            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+            <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">
               <div class="flex justify-center">
                 <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
               </div>
             </td>
           </tr>
-          <tr v-else-if="filteredSach.length === 0">
-            <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
-              Không tìm thấy quyển sách nào
+          <tr v-else-if="filteredMuonSach.length === 0">
+            <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">
+              Không tìm thấy phiếu mượn sách nào
             </td>
           </tr>
-          <tr v-for="sach in filteredSach" :key="sach._id" class="hover:bg-gray-50">
+          <tr v-for="muonSach in filteredMuonSach" :key="muonSach._id" class="hover:bg-gray-50">
             <td class="px-3 py-5 whitespace-nowrap">
-              <div class="text-sm text-center font-medium text-gray-900">{{ sach.MaSach }}</div>
+              <div class="text-sm text-center font-medium text-gray-900">{{ muonSach.MaSach.MaSach }}</div>
             </td>
             <td class="px-3 py-5 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ sach.TenSach }}</div>
+              <div class="text-sm font-medium text-gray-900">{{ muonSach.MaSach.TenSach }}</div>
             </td>
             <td class="px-3 py-5 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">{{ formatDonGia(sach.DonGia) }}</div>
+              <div class="text-sm text-left font-medium text-gray-900">{{ muonSach.MaSach.TacGia }}</div>
             </td>
             <td class="px-3 py-5 whitespace-nowrap">
-                <div class="text-sm text-center font-medium text-gray-900">{{ sach.SoQuyen }}</div>
+              <div class="text-sm text-center font-medium text-gray-900">{{ muonSach.MaDocGia.MaDocGia }}</div>
             </td>
             <td class="px-3 py-5 whitespace-nowrap">
-              <div class="flex items-center">
-                <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">{{ sach.NamXuatBan }}</div>
-                </div>
-              </div>
+              <div class="text-sm font-medium text-gray-900">{{ muonSach.MaDocGia.HoLot + " " + muonSach.MaDocGia.Ten }}</div>
+            </td>
+            <td class="px-3 py-5 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">{{ muonSach.MSNV.MSNV }}</div>
             </td>
              <td class="px-3 py-5 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">{{ sach.TacGia }}</div>
+                  <div class="text-sm text-center font-medium text-gray-900">{{ formatDate(muonSach.NgayMuon) }}</div>
             </td>
             <td class="px-3 py-5 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">{{ sach.MaNXB.TenNXB }}</div>
+                  <div class="text-sm text-center font-medium text-gray-900">{{ muonSach.NgayTra ? formatDate(muonSach.NgayTra) : (isOverdue(muonSach.NgayMuon) ? "Quá hạn" :  "Đang mượn")}}</div>
             </td>
-
-            <td class="px-3 py-5 whitespace-nowrap text-right text-sm font-medium">
-              <div class="flex justify-end space-x-2">
+            <td class="px-3 py-5 whitespace-nowrap text-sm font-medium">
+              <div class="flex justify-center space-x-2">
                 <button
-                  @click="openSachModal(sach)"
-                  class="text-blue-600 hover:text-blue-900 focus:outline-none"
+                  :disabled="muonSach.NgayTra"
+                  @click="openMuonSachModal(muonSach)"
+                  :class="!muonSach.NgayTra ? 'text-blue-600 hover:text-blue-900 focus:outline-none' : 'opacity-50 cursor-not-allowed'"
                   title="Chỉnh sửa"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -114,7 +116,7 @@
                   </svg>
                 </button>
                 <button
-                  @click="confirmDeleteSach(sach)"
+                  @click="confirmDeleteMuonSach(muonSach)"
                   class="text-red-600 hover:text-red-900 focus:outline-none"
                   title="Xóa"
                 >
@@ -122,6 +124,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </button>
+                
               </div>
             </td>
           </tr>
@@ -131,99 +134,58 @@
 
     
 
-    <!-- Modal thêm/sửa sách -->
-    <div v-if="showSachModal" class="fixed inset-0 z-10 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Modal thêm/sửa phiếu mượn sách -->
+    <div v-if="showMuonSachModal" class="fixed inset-0 z-10 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="showSachModal = false"></div>
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="showMuonSachModal = false"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <form @submit.prevent="saveSach">
+          <form @submit.prevent="saveMuonSach">
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <div class="sm:flex sm:items-start">
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                   <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                    {{ editingSach._id ? 'Chỉnh sửa sách' : 'Thêm sách mới' }}
+                    {{ editingMuonSach._id ? 'Trả Sách' : 'Mượn sách' }}
                   </h3>
                   <div class="mt-4 space-y-4">
                     <div>
-                      <label for="MaSach" class="block text-sm font-medium text-gray-700">Mã sách</label>
-                      <input
-                        type="text"
+                      <label for="MaDocGia" class="block text-sm font-medium text-gray-700">Mã đọc giả</label>
+                      <input 
+                        id="MaDocGia"
+                        list="docgia-list"
+                        v-model="editingMuonSach.MaDocGia.MaDocGia"
+                        required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      />
+                        <datalist id="docgia-list">
+                          <option v-for="docGia in docGiaList" :key="docGia._id" :value="docGia.MaDocGia"></option>
+                        </datalist>
+                    </div>
+                    <div>
+                      <label for="MaSach" class="block text-sm font-medium text-gray-700">Mã Sách</label>
+                      <input 
                         id="MaSach"
-                        v-model="editingSach.MaSach"
+                        list="sach-list"
+                        v-model="editingMuonSach.MaSach.MaSach"
                         required
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       />
+                        <datalist id="sach-list">
+                          <option v-for="sach in sachList" :key="sach._id" :value="sach.MaSach"></option>
+                        </datalist>
                     </div>
-                    <div>
-                      <label for="TenSach" class="block text-sm font-medium text-gray-700">Tên Sách</label>
+                    <div v-if="editingMuonSach._id">
+                      <label for="NgayMuon" class="block text-sm font-medium text-gray-700">Ngày mượn</label>
                       <input
-                        id="TenSach"
-                        v-model="editingSach.TenSach"
+                        id="NgayMuon"
+                        v-model="editingMuonSach.NgayMuon"
                         type="text"
+                        :disabled="editingMuonSach._id"
                         class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       ></input>
                     </div>
-                    <div>
-                      <label for="DonGia" class="block text-sm font-medium text-gray-700">Giá (VNĐ)</label>
-                      <input
-                        type="number"
-                        id="DonGia"
-                        v-model="editingSach.DonGia"
-                        required
-                        min="0"
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label for="MaNXB" class="block text-sm font-medium text-gray-700">Nhà xuất bản</label>
-                      <select
-                        id="MaNXB"
-                        v-model="editingSach.MaNXB"
-                        required
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      >
-                        <option value="" disabled>Chọn danh mục</option>
-                        <option v-for="nhaXuatBan in nhaXuatBanList" :key="nhaXuatBan._id" :value="nhaXuatBan._id">
-                          {{ nhaXuatBan.TenNXB }}
-                        </option>
-                      </select>
-                    </div>
-                    <div>
-                      <label for="SoQuyen" class="block text-sm font-medium text-gray-700">Số quyển</label>
-                      <input
-                        type="number"
-                        id="SoQuyen"
-                        v-model="editingSach.SoQuyen"
-                        required
-                        min="0"
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label for="NamXuatBan" class="block text-sm font-medium text-gray-700">Năm xuất bản</label>
-                      <input
-                        type="number"
-                        id="NamXuatBan"
-                        v-model="editingSach.NamXuatBan"
-                        required
-                        min="0"
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label for="TacGia" class="block text-sm font-medium text-gray-700">Tác giả</label>
-                      <input
-                        id="TacGia"
-                        v-model="editingSach.TacGia"
-                        type="text"
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      ></input>
-                    </div>
-                    
-                    
                   </div>
                 </div>
               </div>
@@ -234,11 +196,11 @@
                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
               >
                 
-                {{editingSach._id ? 'Cập nhật' : 'Thêm mới' }}
+                {{editingMuonSach._id ? 'Trả' : 'Mượn' }}
               </button>
               <button
                 type="button"
-                @click="showSachModal = false"
+                @click="showMuonSachModal = false"
                 class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
               >
                 Hủy
@@ -270,7 +232,7 @@
                 </h3>
                 <div class="mt-2">
                   <p class="text-sm text-gray-500">
-                    Bạn có chắc chắn muốn xóa sách <span class="font-semibold">{{ sachToDelete?.MaSach }}</span>? Hành động này không thể hoàn tác.
+                    Bạn có chắc chắn muốn xóa phiếu mượn này? Hành động này không thể hoàn tác.
                   </p>
                 </div>
               </div>
@@ -279,7 +241,7 @@
           <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
             <button
               type="button"
-              @click="deleteProduct"
+              @click="deleteMuonSach"
               class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Xóa
@@ -300,46 +262,78 @@
 
 <script setup>
 
-import { ref, reactive, computed, onMounted, watch } from 'vue';
-import { getAllSach, createSach, updateSach, deleteSach as apiDeleteSach, getAllNhaXuatBan } from '../api';
+import { ref, reactive, computed, onMounted } from 'vue';
+import { getAllMuonSach, createMuonSach, returnBook, getAllDocGia, getAllSach, deleteMuonSach as apiDeleteMuonSach } from '../api';
+import { useToast } from 'vue-toastification';
 
 // State
+const muonSachList = ref([]);
+const docGiaList = ref([]);
 const sachList = ref([]);
-const nhaXuatBanList = ref([]);
+
 const loading = ref(true);
+
+const toast = useToast();
 const searchQuery = ref('');
-const showSachModal = ref(false);
+const showMuonSachModal = ref(false);
 const showDeleteModal = ref(false);
-const sachToDelete = ref(null);
-const editingSach = reactive({
+const muonSachToDelete = ref(null);
+const editingMuonSach = reactive({
   _id: null,
   MaSach: '',
-  TenSach: '',
-  DonGia: 0,
-  MaNXB: '',
-  SoQuyen: 0,
-  NamXuatBan: 0,
-  TacGia: ''
+  MaDocGia: '',
+  NgayMuon: '',
 });
 
-const filteredSach = computed(() => {
-  let result = [...sachList.value];
+const filteredMuonSach = computed(() => {
+  let result = [...muonSachList.value];
   
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    result = result.filter(sach => 
-      sach.TenSach.toLowerCase().includes(query) || 
-      sach.TacGia.toLowerCase().includes(query)
+    result = result.filter(muonSach => 
+      muonSach.MaSach.MaSach.toLowerCase().includes(query) || 
+      muonSach.MaSach.TenSach.toLowerCase().includes(query) ||
+      muonSach.MaDocGia.MaDocGia.toLowerCase().includes(query) ||
+      muonSach.MaDocGia.HoLot.toLowerCase().includes(query) ||
+      muonSach.MaDocGia.Ten.toLowerCase().includes(query) ||
+      muonSach.TrangThai.toLowerCase().includes(query)
     );
   }
   return result;
 });
 
 
+const loadMuonSach = async () => {
+  loading.value = true;
+  try {
+    const response = await getAllMuonSach();
+    muonSachList.value = response.data;
+    for (const muonSach of muonSachList.value) {
+      muonSach.TrangThai = muonSach.NgayTra ? formatDate(muonSach.NgayTra) : isOverdue(muonSach.NgayMuon) ? "Quá hạn" : "Đang mượn"
+    }
+  } catch (error) {
+    console.error('Lỗi tải phiếu mượn sách: ', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const loadDocGia = async () => {
+  loading.value = true;
+  try {
+    const response = await getAllDocGia();
+    docGiaList.value = response.data;
+  } catch (error) {
+    console.error('Lỗi tải đọc giả: ', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
 const loadSach = async () => {
   loading.value = true;
   try {
-    const response = await getAllSach();
+    const response = await getAllSach({avaiable: true});
     sachList.value = response.data;
   } catch (error) {
     console.error('Lỗi tải sách: ', error);
@@ -349,85 +343,99 @@ const loadSach = async () => {
 };
 
 
-const loadNhaXuatBan = async () => {
-  try {
-    const response = await getAllNhaXuatBan();
-    nhaXuatBanList.value = response.data;
-  } catch (error) {
-    console.error('Lỗi tải nhà xuất bản: ', error);
-  }
-};
-
-const openSachModal = (sach = null) => {
-  if (sach) {
-    Object.assign(editingSach, {
-      _id: sach._id,
-      MaSach: sach.MaSach,
-      TenSach: sach.TenSach || '',
-      DonGia: sach.DonGia,
-      MaNXB: sach.MaNXB?._id || sach.MaNXB || '',
-      SoQuyen: sach.SoQuyen,
-      NamXuatBan: sach.NamXuatBan,
-      TacGia: sach.TacGia
+const openMuonSachModal = (muonSach = null) => {
+  if (muonSach) {
+    Object.assign(editingMuonSach, {
+      _id: muonSach._id,
+      MaSach: muonSach.MaSach,
+      MaDocGia: muonSach.MaDocGia,
+      NgayMuon: formatDate(muonSach.NgayMuon)
     });
     
   } else {
-    Object.assign(editingSach, {
+    Object.assign(editingMuonSach, {
       _id: null,
-      MaSach: '',
-      TenSach: '',
-      DonGia: 0,
-      category: '',
-      SoQuyen: 0,
-      imageUrl: ''
+      MaSach: {},
+      MaDocGia: {}
     });
   }
-  showSachModal.value = true;
+  showMuonSachModal.value = true;
 };
   
 
-const saveSach = async () => {
+const saveMuonSach = async () => {
   try {
     let response;
-    if (editingSach._id) {
-      response = await updateSach(editingSach._id, editingSach);
+    if (editingMuonSach._id) {
+      response = await returnBook(editingMuonSach._id);
+      if(response){
+        toast.success(`Đã trả sách ${editingMuonSach.MaSach.MaSach} của đọc giả ${editingMuonSach.MaDocGia.MaDocGia}  thành công`, {
+          position: "top-right",
+          timeout: 3000,
+          toastClassName: "custom-toast"
+        });
+      }
     } else {
-      response = await createSach(editingSach);
+      response = await createMuonSach(editingMuonSach);
+      if(response){
+        toast.success(`Đã thêm phiếu mượn sách ${editingMuonSach.MaSach.MaSach} của đọc giả ${editingMuonSach.MaDocGia.MaDocGia}  thành công`, {
+          position: "top-right",
+          timeout: 3000,
+          toastClassName: "custom-toast"
+        });
+      }
     }
     
-    showSachModal.value = false;
-    loadSach();
+    showMuonSachModal.value = false;
+    loadMuonSach();
   } catch (error) {
-    console.error('Lỗi lưu sách:', error);
-    alert('Có lỗi xảy ra khi lưu thông tin sách. Vui lòng thử lại.');
+    console.error('Lỗi lưu phiếu mượn sách:', error);
+    toast.error('Có lỗi xảy ra khi lưu thông tin phiếu mượn sách. Vui lòng thử lại.', {
+      position: "top-right",
+      timeout: 3000,
+      toastClassName: "custom-toast"
+    });
   } 
 };
 
-const confirmDeleteSach  = (sach) => {
-  sachToDelete.value = sach;
+const confirmDeleteMuonSach  = (muonSach) => {
+  muonSachToDelete.value = muonSach;
   showDeleteModal.value = true;
 };
 
-const deleteSach = async () => {
+const deleteMuonSach = async () => {
   try {
-    await apiDeleteSach(sachToDelete.value._id);
+    const response = await apiDeleteMuonSach(muonSachToDelete.value._id);
+    if(response){
+      toast.success('Đã xóa phiếu mượn sách thành công', {
+          position: "top-right",
+          timeout: 3000,
+          toastClassName: "custom-toast"
+        });
+    }
     showDeleteModal.value = false;
-    loadSachs();
+    loadMuonSach();
   } catch (error) {
-    console.error('Lỗi xóa sách:', error);
-    alert('Có lỗi xảy ra khi xóa sách. Vui lòng thử lại.');
+    console.error('Lỗi xóa đọc giả:', error);
+    alert('Có lỗi xảy ra khi xóa đọc giả. Vui lòng thử lại.');
   }
 };
 
-const formatDonGia = (DonGia) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
-  }).format(DonGia);
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      .format(new Date(dateString))
+      .replace(/\//g, '-');
+};
+
+const isOverdue = (ngayMuon) => {
+    return ngayMuon < new Date().getDate - 30;
 };
 
 onMounted(() => {
-  loadNhaXuatBan();
   loadSach();
+  loadDocGia();
+  loadMuonSach();
 });
 </script>

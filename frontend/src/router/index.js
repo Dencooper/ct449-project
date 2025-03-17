@@ -3,7 +3,6 @@ import { useAuthStore } from '../stores/auth'
 
 import LoginPage from '../views/LoginPage.vue'
 import MePage from '../views/MePage.vue'
-import Dashboard from '../views/Dashboard.vue'
 import DocGiaPage from '../views/DocGiaPage.vue'
 import SachPage from '../views/SachPage.vue'
 import NhaXuatBanPage from '../views/NhaXuatBanPage.vue'
@@ -20,16 +19,9 @@ const routes = [
     meta: { guestOnly: true }
   },
   {
-    path: '/me',
+    path: '/',
     name: 'me',
     component: MePage,
-    meta: { requiresAuth: true }
-  },
-
-  {
-    path: '/',
-    name: 'dashboard',
-    component: Dashboard,
     meta: { requiresAuth: true }
   },
   {

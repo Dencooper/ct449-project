@@ -44,7 +44,7 @@ export const getDocGiaById = async (req, res) => {
 
 export const createDocGia = async (req, res) => {
   if (req.body.NgaySinh) {
-      const [day, month, year] = req.body.NgaySinh.split('/');
+      const [day, month, year] = req.body.NgaySinh.split('-');
       req.body.NgaySinh = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
     }
   try {
@@ -67,7 +67,7 @@ export const createDocGia = async (req, res) => {
 
 export const updateDocGia = async (req, res) => {
   if (req.body.NgaySinh) {
-      const [day, month, year] = req.body.NgaySinh.split('/');
+      const [day, month, year] = req.body.NgaySinh.split('-');
       req.body.NgaySinh = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
     }
   try {

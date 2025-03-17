@@ -25,12 +25,18 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useAuthStore } from './stores/auth'; 
+import { onMounted, computed} from 'vue';
+import { useAuthStore } from './stores/auth';
+import { useRoute } from 'vue-router';
 import AdminSidebar from './components/AdminSidebar.vue';
 import LoginPage from './views/LoginPage.vue';
 
 const authStore = useAuthStore();
+const route = useRoute();
+
+const currentAdminMenu = computed(() => {
+  return route.name
+})
 
 onMounted(async () => {
   if (!authStore.isNhanVienLoaded) {

@@ -163,11 +163,9 @@ export const loginNhanVien = async (req, res) => {
   }
 };
 
-export const changePassword = async (req, res) => {
+export const updateProfile = async (req, res) => {
   try {
-    const { currentPassword, newPassword } = req.body;
-    
-    const nhanVien = await NhanVien.findOne({ MSNV: req.params.id });
+    const nhanVien = await NhanVien.findById(req.nhanVien._id);
     
     if (!nhanVien) {
       return res.status(404).json({
@@ -175,27 +173,22 @@ export const changePassword = async (req, res) => {
         message: 'Không tìm thấy nhân viên'
       });
     }
+    nhanVien.HoTenNV = req.body.HoTen || nhanVien.HoTenNV;
+    nhanVien.DiaChi = req.body.DiaChi || nhanVien.DiaChi;
+    nhanVien.SoDienThoai = req.body.SoDienThoai || nhanVien.SoDienThoai;
+
+    if(req.body.Password) nhanVien.Password = req.body.Password;
     
-    const isMatch = await nhanVien.comparePassword(currentPassword);
-    
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Mật khẩu hiện tại không chính xác'
-      });
-    }
-    
-    nhanVien.Password = newPassword;
     await nhanVien.save();
-    
     res.status(200).json({
       success: true,
-      message: 'Đổi mật khẩu thành công'
+      message: 'Cập nhật nhân viên thành công',
+      data: nhanVien
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Không thể đổi mật khẩu',
+      message: 'Không thể cập nhật nhân viên',
       error: error.message
     });
   }

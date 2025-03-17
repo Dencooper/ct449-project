@@ -1,9 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-100">
-    <!-- Header và công cụ tìm kiếm -->
     <div class="flex-1 p-5">
       <h1 class="text-3xl font-semibold text-gray-900 mb-4 h-16 md:mb-0">Quản Lý Sách</h1>
-      <!-- Bộ lọc -->
       <div class="flex flex-wrap gap-3 justify-between">
           <div class="relative">
             <input
@@ -20,6 +18,7 @@
             </div>
           </div>
           <button
+            v-if="authStore.nhanVien.ChucVu !== 'Nhan Vien'"
             @click="openSachModal()"
             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
@@ -57,7 +56,7 @@
             <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Nhà xuất bản
             </th>
-            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" v-if="authStore.nhanVien.ChucVu !== 'Nhan Vien'">
               Thao tác
             </th>
           </tr>
@@ -102,7 +101,7 @@
                   <div class="text-sm font-medium text-gray-900">{{ sach.MaNXB.TenNXB }}</div>
             </td>
 
-            <td class="px-3 py-5 whitespace-nowrap text-right text-sm font-medium">
+            <td class="px-3 py-5 whitespace-nowrap text-right text-sm font-medium" v-if="authStore.nhanVien.ChucVu !== 'Nhan Vien'">
               <div class="flex justify-end space-x-2">
                 <button
                   @click="openSachModal(sach)"
@@ -300,14 +299,19 @@
 
 <script setup>
 
-import { ref, reactive, computed, onMounted, watch } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import { getAllSach, createSach, updateSach, deleteSach as apiDeleteSach, getAllNhaXuatBan } from '../api';
+import { useAuthStore } from '../stores/auth';
+import { useToast } from 'vue-toastification';
 
 // State
 const sachList = ref([]);
 const nhaXuatBanList = ref([]);
 const loading = ref(true);
+const authStore = useAuthStore();
+
 const searchQuery = ref('');
+
 const showSachModal = ref(false);
 const showDeleteModal = ref(false);
 const sachToDelete = ref(null);
@@ -321,6 +325,8 @@ const editingSach = reactive({
   NamXuatBan: 0,
   TacGia: ''
 });
+
+const toast = useToast();
 
 const filteredSach = computed(() => {
   let result = [...sachList.value];
@@ -391,8 +397,22 @@ const saveSach = async () => {
     let response;
     if (editingSach._id) {
       response = await updateSach(editingSach._id, editingSach);
+      if(response){
+        toast.success(`Đã cập nhật sách ${editingSach.TenSach} thành công`, {
+          position: "top-right",
+          timeout: 3000,
+          toastClassName: "custom-toast"
+        });
+      }
     } else {
       response = await createSach(editingSach);
+      if(response){
+        toast.success(`Đã thêm sách ${editingSach.TenSach} thành công`, {
+          position: "top-right",
+          timeout: 3000,
+          toastClassName: "custom-toast"
+        });
+      }
     }
     
     showSachModal.value = false;
@@ -400,6 +420,11 @@ const saveSach = async () => {
   } catch (error) {
     console.error('Lỗi lưu sách:', error);
     alert('Có lỗi xảy ra khi lưu thông tin sách. Vui lòng thử lại.');
+    toast.error(`Có lỗi xảy ra khi lưu thông tin sách. Vui lòng thử lại.`, {
+          position: "top-right",
+          timeout: 3000,
+          toastClassName: "custom-toast"
+    });
   } 
 };
 
@@ -411,11 +436,22 @@ const confirmDeleteSach  = (sach) => {
 const deleteSach = async () => {
   try {
     await apiDeleteSach(sachToDelete.value._id);
+    if(response){
+        toast.success(`Đã xóa sách với id: ${editingSach._id} thành công`, {
+          position: "top-right",
+          timeout: 3000,
+          toastClassName: "custom-toast"
+        });
+    }
     showDeleteModal.value = false;
     loadSach();
   } catch (error) {
     console.error('Lỗi xóa sách:', error);
-    alert('Có lỗi xảy ra khi xóa sách. Vui lòng thử lại.');
+    toast.error(`Có lỗi xảy ra khi xóa sách. Vui lòng thử lại.`, {
+          position: "top-right",
+          timeout: 3000,
+          toastClassName: "custom-toast"
+    });
   }
 };
 
