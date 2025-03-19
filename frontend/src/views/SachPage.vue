@@ -63,7 +63,7 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-300">
           <tr v-if="loading">
-            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+            <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
               <div class="flex justify-center">
                 <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
               </div>

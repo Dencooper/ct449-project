@@ -58,14 +58,14 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-300">
           <tr v-if="loading">
-            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
               <div class="flex justify-center">
                 <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
               </div>
             </td>
           </tr>
           <tr v-else-if="filteredNhanVien.length === 0">
-            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
               Không tìm thấy nhân viên nào
             </td>
           </tr>
@@ -261,11 +261,12 @@
 
 import { ref, reactive, computed, onMounted } from 'vue';
 import { getAllNhanVien, createNhanVien, updateNhanVien, deleteNhanVien as apiDeleteNhanVien } from '../api';
+import { useToast } from 'vue-toastification';
 
-// State
 const nhanVienList = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
+const toast = useToast();
 const showNhanVienModal = ref(false);
 const showDeleteModal = ref(false);
 const nhanVienToDelete = ref(null);
@@ -333,8 +334,22 @@ const saveNhanVien = async () => {
     let response;
     if (editingNhanVien._id) {
       response = await updateNhanVien(editingNhanVien._id, editingNhanVien);
+      if(response){
+        toast.success(`Cập nhật thông tin nhân viên ${editingNhanVien.MSNV} thành công`, {
+            position: "top-right",
+            timeout: 3000,
+            toastClassName: "custom-toast"
+          });
+      }
     } else {
       response = await createNhanVien(editingNhanVien);
+      if(response){
+        toast.success('Thêm nhân viên mới thành công', {
+            position: "top-right",
+            timeout: 3000,
+            toastClassName: "custom-toast"
+          });
+      }
     }
     
     showNhanVienModal.value = false;
@@ -353,6 +368,11 @@ const confirmDeleteNhanVien  = (nhanVien) => {
 const deleteNhanVien = async () => {
   try {
     await apiDeleteNhanVien(nhanVienToDelete.value._id);
+    toast.success(`Xóa nhân viên ${editingNhanVien.MSNV} thành công`, {
+      position: "top-right",
+      timeout: 3000,
+      toastClassName: "custom-toast"
+    });
     showDeleteModal.value = false;
     loadNhanVien();
   } catch (error) {

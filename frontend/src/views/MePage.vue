@@ -10,10 +10,6 @@
       <div>
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
           <div class="p-4 border-b">
-            <div v-if="updateSuccess" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-              Cập nhật thông tin thành công!
-            </div>
-            
             <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
               {{ error }}
             </div>
@@ -120,13 +116,13 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { updateProfile as updateNhanVienProfile } from '../api';
+import { useToast } from 'vue-toastification';
 
 const router = useRouter();
 const authStore = useAuthStore();
-
+const toast = useToast();
 const loading = ref(true);
 const updateLoading = ref(false);
-const updateSuccess = ref(false);
 const error = ref('');
 const confirmPassword = ref('');
 
@@ -149,8 +145,6 @@ const updateProfile = async () => {
 
     updateLoading.value = true;
     error.value = '';
-    updateSuccess.value = false;
-
     try {
         await updateNhanVienProfile({
             MSNV: nhanVienInfo.value.MSNV,
@@ -161,15 +155,14 @@ const updateProfile = async () => {
         });
 
         await authStore.fetchCurrentNhanVien();
-
-        updateSuccess.value = true;
+        toast.success('Cập nhật thông tin cá nhân thành công', {
+          position: "top-right",
+          timeout: 3000,
+          toastClassName: "custom-toast"
+        });
         nhanVienInfo.value.password = '';
         confirmPassword.value = '';
 
-        // Tự động ẩn thông báo thành công sau 3 giây
-        setTimeout(() => {
-            updateSuccess.value = false;
-        }, 3000);
     } catch (err) {
         error.value = 'Cập nhật thông tin thất bại. Vui lòng thử lại.';
         console.error(err);

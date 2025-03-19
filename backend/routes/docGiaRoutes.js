@@ -5,7 +5,6 @@ import {
   createDocGia,
   updateDocGia,
   deleteDocGia,
-  getDocGiaBorrowHistory,
 } from '../controllers/docGiaController.js';
 import { authenticate, authorizeLibrarian } from '../controllers/authController.js';
 
@@ -18,6 +17,5 @@ router.get('/:id', getDocGiaById);
 router.post('/', createDocGia);
 router.put('/:id', updateDocGia);
 router.delete('/:id', deleteDocGia);
-router.get('/:id/borrowings', getDocGiaBorrowHistory);
 
 export default router;

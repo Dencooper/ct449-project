@@ -133,23 +133,3 @@ export const deleteDocGia = async (req, res) => {
     });
   }
 };
-
-export const getDocGiaBorrowHistory = async (req, res) => {
-  try {
-    const borrowHistory = await TheoDoiMuonSach.find({ MaDocGia: req.params.id })
-      .populate('MaSach', 'TenSach TacGia')
-      .sort({ NgayMuon: -1 });
-    
-    res.status(200).json({
-      success: true,
-      count: borrowHistory.length,
-      data: borrowHistory
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Không thể lấy lịch sử mượn sách',
-      error: error.message
-    });
-  }
-};

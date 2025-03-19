@@ -28,6 +28,8 @@ const theoDoiMuonSachSchema = new mongoose.Schema({
   timestamps: true
 });
 
+theoDoiMuonSachSchema.index({ MaDocGia: 1, MaSach: 1, NgayMuon: 1 }, { unique: true });
+
 const TheoDoiMuonSach = mongoose.model('TheoDoiMuonSach', theoDoiMuonSachSchema);
 
 export default TheoDoiMuonSach;

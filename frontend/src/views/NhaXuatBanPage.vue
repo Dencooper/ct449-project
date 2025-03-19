@@ -230,15 +230,17 @@
 
 <script setup>
 
-import { ref, reactive, computed, onMounted, watch } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import { getAllNhaXuatBan, createNhaXuatBan, updateNhaXuatBan, deleteNhaXuatBan as apiDeleteNhaXuatBan, getNhaXuatBanBooks } from '../api';
 import { useAuthStore } from '../stores/auth';
+import { useToast } from 'vue-toastification';
 
 // State
 const nhaXuatBanList = ref([]);
 const loading = ref(true);
 const authStore = useAuthStore();
 const searchQuery = ref('');
+const toast = useToast();
 const showNhaXuatBanModal = ref(false);
 const showDeleteModal = ref(false);
 const nhaXuatBanToDelete = ref(null);
@@ -306,8 +308,22 @@ const saveNhaXuatBan = async () => {
     let response;
     if (editingNhaXuatBan._id) {
       response = await updateNhaXuatBan(editingNhaXuatBan._id, editingNhaXuatBan);
+      if(response){
+        toast.success(`Cập nhật thông tin nhà xuất bản ${editingNhaXuatBan.MaNXB} thành công`, {
+            position: "top-right",
+            timeout: 3000,
+            toastClassName: "custom-toast"
+          });
+      }
     } else {
       response = await createNhaXuatBan(editingNhaXuatBan);
+      if(response){
+        toast.success('Thêm nhà xuất bản mới thành công', {
+            position: "top-right",
+            timeout: 3000,
+            toastClassName: "custom-toast"
+          });
+      }
     }
     
     showNhaXuatBanModal.value = false;
@@ -326,6 +342,11 @@ const confirmDeleteNhaXuatBan  = (nhaXuatBan) => {
 const deleteNhaXuatBan = async () => {
   try {
     await apiDeleteNhaXuatBan(nhaXuatBanToDelete.value._id);
+    toast.success(`Xóa nhà xuất bản ${editingNhaXuatBan.MaNXB} thành công`, {
+      position: "top-right",
+      timeout: 3000,
+      toastClassName: "custom-toast"
+    });
     showDeleteModal.value = false;
     loadNhaXuatBan();
   } catch (error) {

@@ -285,11 +285,12 @@
 
 import { ref, reactive, computed, onMounted, } from 'vue';
 import { getAllDocGia, createDocGia, updateDocGia, deleteDocGia as apiDeleteDocGia } from '../api';
+import { useToast } from 'vue-toastification';
 
-// State
 const docGiaList = ref([]);
 const loading = ref(true);
-const errorMessage = ref('')
+const toast = useToast();
+const errorMessage = ref('');
 const searchQuery = ref('');
 const showDocGiaModal = ref(false);
 const showDeleteModal = ref(false);
@@ -367,8 +368,22 @@ const saveDocGia = async () => {
     let response;
     if (editingDocGia._id) {
       response = await updateDocGia(editingDocGia._id, editingDocGia);
+      if(response){
+        toast.success(`Cập nhật thông tin đọc giả ${editingDocGia.MaDocGia} thành công`, {
+            position: "top-right",
+            timeout: 3000,
+            toastClassName: "custom-toast"
+        });
+      }
     } else {
       response = await createDocGia(editingDocGia);
+      if(response){
+        toast.success('Thêm đọc giả mới thành công', {
+            position: "top-right",
+            timeout: 3000,
+            toastClassName: "custom-toast"
+        });
+      }
     }
     
     showDocGiaModal.value = false;
@@ -387,6 +402,11 @@ const confirmDeleteDocGia  = (docGia) => {
 const deleteDocGia = async () => {
   try {
     await apiDeleteDocGia(docGiaToDelete.value._id);
+    toast.success(`Xóa đọc giả ${docGiaToDelete.value.MaDocGia} thành công`, {
+        position: "top-right",
+        timeout: 3000,
+        toastClassName: "custom-toast"
+      });
     showDeleteModal.value = false;
     loadDocGia();
   } catch (error) {
